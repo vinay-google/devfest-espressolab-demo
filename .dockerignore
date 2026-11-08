@@ -1,0 +1,7 @@
+.git
+.gitignore
+.gemini
+node_modules
+tests
+*.md
+docs

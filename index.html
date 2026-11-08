@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EspressoLab - Espresso Dial-In Simulator</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="viewport-wrapper">
+    <div id="app-viewport">
+      <!-- HEADER BAR -->
+      <header id="app-header">
+        <div class="header-brand">
+          <span class="brand-icon">&#9749;</span>
+          <h1 class="brand-title">EspressoLab</h1>
+          <span class="brand-badge">Simulator</span>
+        </div>
+
+        <div class="header-presets">
+          <span class="preset-label">Roast Profiles:</span>
+          <button class="preset-btn" data-preset="light" title="Light Ethiopian: 19.5g, 310µm, 95°C, 45g yield">Light Ethiopian (1)</button>
+          <button class="preset-btn active" data-preset="medium" title="Medium Colombia: 18.0g, 340µm, 93°C, 36g yield">Medium Colombia (2)</button>
+          <button class="preset-btn" data-preset="dark" title="Dark Italian: 16.5g, 390µm, 90°C, 30g yield">Dark Italian (3)</button>
+        </div>
+
+        <div class="header-actions">
+          <button id="btn-reset" class="btn-secondary" title="Reset all parameters and telemetry (R)">&#8635; Reset (R)</button>
+        </div>
+      </header>
+
+      <!-- MAIN WORKSPACE: 3-COLUMN GRID (320px | 460px | 480px) -->
+      <main id="app-workspace">
+        <!-- LEFT CONTROL RAIL (320px) -->
+        <aside id="controls-panel" class="panel">
+          <div class="panel-header">
+            <h2>Dial-In Parameters</h2>
+            <span class="panel-subtitle">Fine adjustments</span>
+          </div>
+
+          <div class="controls-list">
+            <!-- DOSE SLIDER -->
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="slider-dose">Dose (Dry Coffee)</label>
+                <div class="stepper-wrap">
+                  <button class="stepper-btn" data-param="dose" data-dir="-1" title="Decrease dose">-</button>
+                  <span id="val-dose" class="readout-pill">18.0 g</span>
+                  <button class="stepper-btn" data-param="dose" data-dir="1" title="Increase dose">+</button>
+                </div>
+              </div>
+              <input type="range" id="slider-dose" min="14.0" max="22.0" step="0.5" value="18.0">
+              <div class="slider-ticks"><span>14g</span><span>18g</span><span>22g</span></div>
+            </div>
+
+            <!-- GRIND SIZE SLIDER -->
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="slider-grind">Grind Particle Size</label>
+                <div class="stepper-wrap">
+                  <button class="stepper-btn" data-param="grind" data-dir="-1" title="Finer grind">-</button>
+                  <span id="val-grind" class="readout-pill">340 µm</span>
+                  <button class="stepper-btn" data-param="grind" data-dir="1" title="Coarser grind">+</button>
+                </div>
+              </div>
+              <input type="range" id="slider-grind" min="200" max="500" step="5" value="340">
+              <div class="slider-ticks"><span>200µm (Fine)</span><span>350µm</span><span>500µm (Coarse)</span></div>
+            </div>
+
+            <!-- WATER TEMP SLIDER -->
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="slider-temp">Water Temperature</label>
+                <div class="stepper-wrap">
+                  <button class="stepper-btn" data-param="temperature" data-dir="-1" title="Cooler boiler">-</button>
+                  <span id="val-temp" class="readout-pill">93.0 °C</span>
+                  <button class="stepper-btn" data-param="temperature" data-dir="1" title="Hotter boiler">+</button>
+                </div>
+              </div>
+              <input type="range" id="slider-temp" min="88.0" max="96.0" step="0.5" value="93.0">
+              <div class="slider-ticks"><span>88°C</span><span>92°C</span><span>96°C</span></div>
+            </div>
+
+            <!-- PUMP PRESSURE SLIDER -->
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="slider-pressure">Pump Pressure</label>
+                <div class="stepper-wrap">
+                  <button class="stepper-btn" data-param="pressure" data-dir="-1" title="Lower pressure">-</button>
+                  <span id="val-pressure" class="readout-pill">9.0 bar</span>
+                  <button class="stepper-btn" data-param="pressure" data-dir="1" title="Higher pressure">+</button>
+                </div>
+              </div>
+              <input type="range" id="slider-pressure" min="6.0" max="12.0" step="0.5" value="9.0">
+              <div class="slider-ticks"><span>6 bar</span><span>9 bar</span><span>12 bar</span></div>
+            </div>
+
+            <!-- TARGET YIELD SLIDER -->
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="slider-yield">Target Cup Yield</label>
+                <div class="stepper-wrap">
+                  <button class="stepper-btn" data-param="targetYield" data-dir="-1" title="Shorter shot">-</button>
+                  <span id="val-yield" class="readout-pill">36.0 g</span>
+                  <button class="stepper-btn" data-param="targetYield" data-dir="1" title="Longer shot">+</button>
+                </div>
+              </div>
+              <input type="range" id="slider-yield" min="24.0" max="50.0" step="1.0" value="36.0">
+              <div class="slider-ticks"><span>24g (Ristretto)</span><span>36g (1:2)</span><span>50g (Lungo)</span></div>
+            </div>
+          </div>
+
+          <!-- PRIMARY PULL SHOT LEVER -->
+          <div class="pull-action-wrap">
+            <button id="btn-pull-shot" class="btn-primary btn-pull">
+              &#9654; PULL SHOT (SPACE)
+            </button>
+          </div>
+        </aside>
+
+        <!-- CENTER EXTRACTION STAGE (460px) -->
+        <section id="stage-panel" class="panel">
+          <div class="panel-header">
+            <h2>Extraction Stage</h2>
+            <span class="panel-subtitle">Bottomless 58mm Portafilter</span>
+          </div>
+          <div class="canvas-container">
+            <canvas id="canvas-stream" width="460" height="440"></canvas>
+          </div>
+        </section>
+
+        <!-- RIGHT TELEMETRY & FLAVOR RADAR (480px) -->
+        <section id="telemetry-panel" class="panel">
+          <div class="panel-header">
+            <h2>Telemetry & Sensory Radar</h2>
+            <span class="panel-subtitle">Real-time dynamic telemetry</span>
+          </div>
+
+          <!-- ANALOG DIALS ROW -->
+          <div class="gauges-row">
+            <!-- PRESSURE GAUGE -->
+            <div class="gauge-card">
+              <svg class="analog-gauge" viewBox="0 0 160 120">
+                <path d="M 25 105 A 65 65 0 1 1 135 105" fill="none" stroke="#27272a" stroke-width="10" stroke-linecap="round"/>
+                <!-- Green sweet-spot arc 8-10 bar -->
+                <path d="M 68 28 A 65 65 0 0 1 106 34" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round"/>
+                <line id="gauge-pressure-needle" x1="80" y1="80" x2="80" y2="25" stroke="#ef4444" stroke-width="3" stroke-linecap="round" transform="rotate(-120, 80, 80)"/>
+                <circle cx="80" cy="80" r="5" fill="#f4f4f5"/>
+              </svg>
+              <div class="gauge-info">
+                <span class="gauge-title">PRESSURE</span>
+                <span id="gauge-pressure-val" class="gauge-value">0.0 bar</span>
+              </div>
+            </div>
+
+            <!-- FLOW RATE GAUGE -->
+            <div class="gauge-card">
+              <svg class="analog-gauge" viewBox="0 0 160 120">
+                <path d="M 25 105 A 65 65 0 1 1 135 105" fill="none" stroke="#27272a" stroke-width="10" stroke-linecap="round"/>
+                <!-- Teal sweet-spot arc 1.2 - 2.2 g/s -->
+                <path d="M 52 48 A 65 65 0 0 1 95 31" fill="none" stroke="#14b8a6" stroke-width="10" stroke-linecap="round"/>
+                <line id="gauge-flow-needle" x1="80" y1="80" x2="80" y2="25" stroke="#14b8a6" stroke-width="3" stroke-linecap="round" transform="rotate(-120, 80, 80)"/>
+                <circle cx="80" cy="80" r="5" fill="#f4f4f5"/>
+              </svg>
+              <div class="gauge-info">
+                <span class="gauge-title">FLOW RATE</span>
+                <span id="gauge-flow-val" class="gauge-value">0.0 g/s</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIGITAL HUD METRICS -->
+          <div class="hud-metrics-row">
+            <div class="metric-card">
+              <span class="metric-label">TIME</span>
+              <span id="hud-timer" class="metric-val">0.0s</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">WEIGHT</span>
+              <span id="hud-yield" class="metric-val">0.0g</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">EXTRACTION YIELD</span>
+              <span id="hud-ey" class="metric-val">0.0%</span>
+            </div>
+          </div>
+
+          <!-- 5-AXIS SENSORY RADAR -->
+          <div class="radar-container">
+            <svg id="flavor-radar-svg" viewBox="0 0 280 230">
+              <!-- Radial Grid Web Rings -->
+              <polygon points="140,45 230,111 196,217 84,217 50,111" fill="none" stroke="#27272a" stroke-width="1"/>
+              <polygon points="140,73 204,120 180,195 100,195 76,120" fill="none" stroke="#27272a" stroke-width="1"/>
+              <polygon points="140,101 178,129 164,174 116,174 102,129" fill="none" stroke="#27272a" stroke-width="1"/>
+
+              <!-- Axis Rays -->
+              <line x1="140" y1="140" x2="140" y2="45" stroke="#3f3f46" stroke-width="1"/>
+              <line x1="140" y1="140" x2="230" y2="111" stroke="#3f3f46" stroke-width="1"/>
+              <line x1="140" y1="140" x2="196" y2="217" stroke="#3f3f46" stroke-width="1"/>
+              <line x1="140" y1="140" x2="84" y2="217" stroke="#3f3f46" stroke-width="1"/>
+              <line x1="140" y1="140" x2="50" y2="111" stroke="#3f3f46" stroke-width="1"/>
+
+              <!-- Target Ghost Silhouette (Gold standard) -->
+              <polygon id="radar-polygon-ghost" points="140,140 140,140 140,140 140,140 140,140" fill="rgba(245, 158, 11, 0.15)" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+              <!-- Active Dynamic Flavor Polygon -->
+              <polygon id="radar-polygon-active" points="140,140 140,140 140,140 140,140 140,140" fill="rgba(56, 189, 248, 0.35)" stroke="#38bdf8" stroke-width="2.5"/>
+
+              <!-- Axis Text Labels -->
+              <text x="140" y="32" text-anchor="middle" class="radar-label">SOUR</text>
+              <text x="242" y="112" text-anchor="start" class="radar-label">SWEET</text>
+              <text x="204" y="226" text-anchor="start" class="radar-label">BODY</text>
+              <text x="76" y="226" text-anchor="end" class="radar-label">BITTER</text>
+              <text x="38" y="112" text-anchor="end" class="radar-label">CLARITY</text>
+            </svg>
+          </div>
+        </section>
+      </main>
+
+      <!-- LOWER DECK: 2-COLUMN GRID (495px | 775px) -->
+      <footer id="app-footer">
+        <!-- BARISTA COACH CARD (495px) -->
+        <section id="coach-card" class="panel footer-panel">
+          <div class="coach-header">
+            <div class="coach-title-wrap">
+              <span class="coach-icon">&#128161;</span>
+              <h3 id="coach-title">Simulator Ready</h3>
+            </div>
+            <span id="coach-badge" class="badge badge-idle">READY TO BREW</span>
+          </div>
+
+          <div class="coach-body">
+            <p id="coach-diagnosis" class="coach-diag">Adjust input parameters or select a preset, then pull the shot.</p>
+            <p id="coach-action" class="coach-act">Press Spacebar or click "Pull Shot" to start extraction.</p>
+            <div id="coach-metrics" class="coach-summary-stats">Yield: 0.0g | Ratio: 1:0.00 | Time: 0.0s | EY: 0.0%</div>
+            <ul id="coach-notes" class="coach-flavor-tags"></ul>
+          </div>
+        </section>
+
+        <!-- EXTRACTION GRAPH HUD (775px) -->
+        <section id="graph-panel" class="panel footer-panel">
+          <div class="panel-header-inline">
+            <h3>Extraction Curves: Yield (g) &amp; Flow Rate (g/s) vs Time</h3>
+            <div class="graph-legend">
+              <span class="legend-item"><span class="legend-dot yield-dot"></span>Yield (g)</span>
+              <span class="legend-item"><span class="legend-dot flow-dot"></span>Flow (g/s)</span>
+              <span class="legend-item"><span class="legend-dot target-dot"></span>Target Zone</span>
+            </div>
+          </div>
+          <div class="graph-container">
+            <svg id="shot-graph-svg" viewBox="0 0 775 240" preserveAspectRatio="none"></svg>
+          </div>
+        </section>
+      </footer>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
