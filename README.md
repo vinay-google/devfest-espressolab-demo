@@ -22,6 +22,7 @@ EspressoLab is a zero-backend, client-side educational microapplication designed
 - [Local Development & Running](#local-development--running)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
 - [Automated Test Suite](#automated-test-suite)
+- [Barista Coach Diagnostic Engine](#barista-coach-diagnostic-engine)
 - [Repository Artifacts Directory](#repository-artifacts-directory)
 
 ---
@@ -43,76 +44,83 @@ EspressoLab is a zero-backend, client-side educational microapplication designed
 
 ### 1. Simulator Runtime Architecture
 
-The web application runs 100% in-browser with zero external runtime dependencies:
+The web application is structured into three clean, decoupled layers running entirely client-side:
 
 ```mermaid
 flowchart TD
-    subgraph UI ["User Interface (DOM / Canvas / SVG)"]
-        A["Input Controls (Dose, Grind, Temp, Pressure)"]
-        B["Preset Selector (Light, Medium, Dark)"]
-        C["HTML5 Canvas (Stream, Droplets & Crema Foam)"]
-        D["SVG Telemetry (Pressure & Flow Needle Gauges)"]
-        E["SVG HUD (Real-time Extraction Curve)"]
-        F["SVG Sensory Radar (5-Axis Flavor Profile)"]
-        G["Coach Diagnosis Banner (3-Tier Priority)"]
+    subgraph Layer1 ["1. Input & Presets Layer"]
+        direction LR
+        IN1["User Sliders<br/>• Dose: 14–22g<br/>• Grind: 1–10<br/>• Temp: 88–96°C<br/>• Pressure: 6–12 bar"]
+        IN2["Roast Presets<br/>• Light Ethiopian<br/>• Medium Colombia<br/>• Dark Italian"]
+        IN3["Keyboard Controls<br/>• Spacebar: Pull/Stop<br/>• R: Reset<br/>• 1–3: Presets"]
     end
 
-    subgraph State ["Reactive State Management"]
-        H["StateManager (FSM: IDLE, PRE_INFUSION, EXTRACTING, COMPLETED)"]
+    subgraph Layer2 ["2. Simulation Engine (60Hz Numerical Loop)"]
+        FSM["StateManager (Finite State Machine)<br/>[ IDLE ➔ PRE_INFUSION ➔ EXTRACTING ➔ COMPLETED ]"]
+        PHYS["PhysicsEngine (Darcy Hydraulic Dynamics)<br/>• Pre-infusion dwell delay (t_dwell)<br/>• Temp-dependent dynamic viscosity μ(T)<br/>• Dynamic porous bed resistance & erosion clamp"]
+        CHEM["Soluble Dissolution Kinetics<br/>• Washout proxy decay<br/>• Cumulative Yield (g), EY%, TDS%<br/>• Stream blonding color math"]
     end
 
-    subgraph Engine ["Simulation & Physical Engines"]
-        I["PhysicsEngine (Darcy Hydraulic Flow & Viscosity)"]
-        J["Soluble Dissolution Kinetics (EY% & TDS%)"]
-        K["CoachEngine (Prioritized Diagnostic Rules)"]
+    subgraph Layer3 ["3. Dual Presentation Layer"]
+        direction LR
+        subgraph CanvasView ["HTML5 Canvas (60 FPS Stream Viewport)"]
+            CANV["• Portafilter stream coalescence<br/>• Droplet physics & detachment<br/>• Dynamic crema foam head"]
+        end
+        subgraph SvgView ["SVG / DOM Telemetry Dashboard"]
+            GAUGE["• Analog Pressure & Flow Needle Gauges<br/>• Real-time 775px Extraction Curve HUD<br/>• Dynamic 5-Axis Flavor Radar Polygon"]
+            COACH["• Prioritized Barista Coach Feedback<br/>[ Tier 1 Flow ➔ Tier 2 Ratio ➔ Tier 3 Temp ]"]
+        end
     end
 
-    A -->|"Update Parameters"| H
-    B -->|"Load Preset"| H
-    H -->|"Time-step (dt = 1/60s)"| I
-    I -->|"Flow Q(t) & Resistance"| J
-    J -->|"Yield, EY%, TDS%"| H
-    H -->|"Render State"| C
-    H -->|"Gauge Values"| D
-    H -->|"Curve Points"| E
-    H -->|"Sensory Scores"| F
-    H -->|"Shot Complete"| K
-    K -->|"Rule Feedback"| G
+    Layer1 -->|"Parameter updates & presets"| FSM
+    FSM <-->|"Time-step (dt = 1/60s)"| PHYS
+    PHYS -->|"Flow rate Q(t) & resistance"| CHEM
+    CHEM -->|"Cumulative yield & solubles"| FSM
+
+    FSM -->|"Stream state & crema"| CanvasView
+    FSM -->|"Telemetry metrics & shot completed"| SvgView
 ```
 
 ### 2. Elephant-Goldfish Model (EGM) Workflow
 
-The Elephant (session context holder) coordinates with stateless Goldfish subagents to eliminate hallucinations, enforce technical rigor, and verify zero spec-to-code drift:
+The Elephant holds session context and authors the specification, while stateless Goldfish subagents rigorously audit it before any code is written, ensuring zero drift between spec and implementation:
 
 ```mermaid
-flowchart LR
-    subgraph Phase1 ["Phase 1: Brainstorm"]
-        A["/egm:egm-brainstorm"] --> B["Elephant Clarification (2 Turns)"]
-        B --> C["Readiness Gate"]
-        C --> D["6-Lens Goldfish Swarm"]
-        D --> E["concepts_brief.md"]
+flowchart TD
+    subgraph P1 ["Phase 1: Specification Brainstorming"]
+        direction TB
+        Prompt["1. User Prompt<br/><b>/egm:egm-brainstorm</b>"] --> Clarify["2. Elephant Clarification<br/>(2 turns: physics model, single-screen UI, coach rules)"]
+        Clarify --> Gate1{"3. Readiness Gate"}
+        Gate1 -->|"Review with Goldfishes"| Swarm["4. 6-Lens Parallel Goldfish Swarm<br/>(Contrarian, Cost, UX, Migration, Observability, Debt)"]
+        Swarm --> Brief["5. Generate Artifact<br/><b>concepts_brief.md</b>"]
     end
 
-    subgraph Phase2 ["Phase 2: Draft & Sync"]
-        E --> F["/egm:egm-draft"]
-        F --> G["Section Approval Gates"]
-        G --> H["docs/designs/espresso_simulator.md"]
-        H --> I["Google Docs MCP: PRD v1"]
+    subgraph P2 ["Phase 2: Formal Drafting & Live Workspace Sync"]
+        direction TB
+        Brief --> Draft["6. Command<br/><b>/egm:egm-draft</b>"]
+        Draft --> Sections["7. Interactive Section Approval Gates<br/>(Overview ➔ Tech Plan ➔ Alternatives ➔ Implementation)"]
+        Sections --> SpecV1["8. Save Specification<br/><b>docs/designs/espresso_simulator.md</b>"]
+        SpecV1 --> GDocV1["9. Workspace MCP Export<br/><b>Google Doc: 'PRD: Espresso Simulator' (v1)</b>"]
     end
 
-    subgraph Phase3 ["Phase 3: Review & Resolve"]
-        H --> J["/egm:egm-review (5-Stage Swarm)"]
-        J --> K["consolidated_review_report.md"]
-        K --> L["/egm:egm-resolve ('auto accept')"]
-        L --> M["Verified PRD + Google Docs MCP Sync"]
+    subgraph P3 ["Phase 3: The Goldfish Protocol & Resolution"]
+        direction TB
+        SpecV1 --> Audit["10. Stateless Audit Command<br/><b>/egm:egm-review docs/designs/espresso_simulator.md</b><br/>(Stages: Zoom Out, Comprehension, Critics, Readiness)"]
+        Audit --> Report["11. Synthesize Audit Report<br/><b>consolidated_review_report.md</b>"]
+        Report --> Resolve["12. Resolution Command<br/><b>/egm:egm-resolve</b> (Apply fixes with 'auto accept')"]
+        Resolve --> SpecV2["13. Patched & Goldfish-Verified PRD"]
+        SpecV2 --> GDocV2["14. Workspace MCP Sync<br/><b>Update 'PRD' Google Doc + Publish 'Goldfish Audit' Doc</b>"]
     end
 
-    subgraph Phase4 ["Phase 4: Build, Drift & Deploy"]
-        M --> N["Coding Agent Implementation"]
-        N --> O["/egm:egm-drift-report"]
-        O --> P["Cloud Run Deploy (GCP)"]
-        P --> Q["Screenshot & Gmail Draft (Workspace MCP)"]
+    subgraph P4 ["Phase 4: Autonomous Build, Drift Verification & Deployment"]
+        direction TB
+        SpecV2 --> Build["15. Autonomous Coding Prompt<br/>(Zero-drift SPA: index.html, styles.css, js/**, tests/**)"]
+        Build --> Drift["16. Drift Detector Command<br/><b>/egm:egm-drift-report docs/designs/</b><br/>(Verifies zero spec-to-code drift)"]
+        Drift --> Deploy["17. Google Cloud Deployment<br/><b>gcloud run deploy espressolab</b> (us-central1, port 8080)"]
+        Deploy --> Gmail["18. Workspace MCP Communication<br/><b>1280x850 Viewport Screenshot & Gmail Announcement Draft</b>"]
     end
+
+    P1 ==> P2 ==> P3 ==> P4
 ```
 
 ### 3. End-to-End Sequence Diagram
@@ -120,33 +128,40 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Speaker as Presenter / Developer
+    actor Presenter as Presenter / Developer
     participant AGY as Antigravity CLI (Elephant)
-    participant GF as Goldfish Subagents (Stateless)
-    participant Drive as Google Workspace (Docs/Gmail)
+    participant GF as Goldfish Swarm (Stateless Critics)
+    participant Drive as Google Workspace (Docs/Gmail MCP)
     participant GCP as Google Cloud (Cloud Run)
 
-    Speaker->>AGY: /egm:egm-brainstorm [EspressoLab requirements]
-    AGY->>Speaker: 2 Clarification turns (Physics, Canvas/SVG, Constraints)
-    Speaker->>AGY: Answers & Readiness Gate confirmation
-    AGY->>GF: Parallel Swarm (YAGNI, Cost, UX, Migration, Observability, Debt)
-    GF-->>AGY: concepts_brief.md compiled
-    Speaker->>AGY: /egm:egm-draft
-    AGY->>Speaker: Section Approval Gates (Overview, Tech Plan, Alternatives, Plan)
-    Speaker->>AGY: Approve all sections
-    AGY->>Drive: Create 'PRD: Espresso Simulator' v1 via Workspace MCP
-    Speaker->>AGY: /egm:egm-review docs/designs/espresso_simulator.md
-    AGY->>GF: Run 5 Stages (Zoom Out, Comprehension, Critics, Readiness)
-    GF-->>AGY: consolidated_review_report.md
-    Speaker->>AGY: /egm:egm-resolve (auto accept)
-    AGY->>Drive: Update PRD & export 'Goldfish Audit: Espresso Simulator'
-    Speaker->>AGY: One-shot implementation prompt
-    AGY->>AGY: Write index.html, css/styles.css, js/**, tests/**, Dockerfile
-    Speaker->>AGY: /egm:egm-drift-report docs/designs/
-    AGY-->>Speaker: Zero Drift Verified!
-    Speaker->>GCP: Deploy to Cloud Run (us-central1, port 8080)
-    GCP-->>Speaker: Public HTTPS Service URL
-    Speaker->>Drive: Capture 1280x850 screenshot & create Gmail draft
+    Note over Presenter,GCP: Act 1 — Spec Brainstorming & Hypothesis Gate
+    Presenter->>AGY: /egm:egm-brainstorm [EspressoLab requirements]
+    AGY->>Presenter: 2 Clarification turns (Puck physics, Canvas/SVG split, UI constraints)
+    Presenter->>AGY: Clarification answers & confirm Readiness Gate
+    AGY->>GF: Spawn 6-Lens Parallel Swarm (YAGNI, Cost, UX, Migration, Observability, Debt)
+    GF-->>AGY: Synthesize concepts_brief.md
+
+    Note over Presenter,GCP: Act 2 — Formal Drafting & Live Workspace Sync
+    Presenter->>AGY: /egm:egm-draft
+    AGY->>Presenter: 4 Section Approval Gates (Overview, Tech Plan, Alternatives, Plan)
+    Presenter->>AGY: Approve sections ➔ Save docs/designs/espresso_simulator.md
+    AGY->>Drive: Create 'PRD: Espresso Simulator' v1 Google Doc via Workspace MCP
+
+    Note over Presenter,GCP: Act 3 — Stateless Goldfish Audit & Resolution
+    Presenter->>AGY: /egm:egm-review docs/designs/espresso_simulator.md
+    AGY->>GF: Execute 5 Review Stages (Zoom Out, Comprehension, Critics, Readiness)
+    GF-->>AGY: Output consolidated_review_report.md
+    Presenter->>AGY: /egm:egm-resolve ➔ 'auto accept'
+    AGY->>Drive: Update PRD Google Doc & publish 'Goldfish Audit: Espresso Simulator'
+
+    Note over Presenter,GCP: Act 4 — Autonomous Build, Drift Verification & Deployment
+    Presenter->>AGY: Implement approved PRD as static SPA + Dockerfile
+    AGY->>AGY: Author index.html, styles.css, js/**, tests/**, Dockerfile
+    Presenter->>AGY: /egm:egm-drift-report docs/designs/
+    AGY-->>Presenter: Audit passed: 0 drift detected between spec and code
+    Presenter->>GCP: Deploy to Cloud Run (us-central1, port 8080)
+    GCP-->>Presenter: Return live HTTPS service URL
+    Presenter->>Drive: Capture 1280x850 screenshot & create Gmail announcement draft
 ```
 
 ---
@@ -361,6 +376,32 @@ node --test tests/*.test.js
 - **Soluble Dissolution Kinetics**: Tests exponential washout decay, Extraction Yield ($EY\%$), and $TDS\%$.
 - **3-Tier Coach Hierarchy**: Tests diagnostic prioritization (Tier 1 Choke/Gusher $\rightarrow$ Tier 2 Ratio $\rightarrow$ Tier 3 Temperature) and God Shot recognition.
 - **FSM State Transitions**: Tests state lifecycle (`IDLE` $\rightarrow$ `PRE_INFUSION` $\rightarrow$ `EXTRACTING` $\rightarrow$ `COMPLETED`).
+
+---
+
+## Barista Coach Diagnostic Engine
+
+The simulator evaluates extraction physics through a prioritized 3-tier diagnostic hierarchy once a shot completes:
+
+```mermaid
+flowchart TD
+    Start["Completed Shot Telemetry<br/>(Time t, Yield Y, EY%, Flow Rate Q, Temp T)"] --> T1{"Tier 1: Flow Rate Anomaly?"}
+
+    T1 -->|"Choked (t > 36s or Q < 0.8 g/s)"| FixChoke["⚠️ Critical Issue: Choked Extraction<br/><b>Recommendation</b>: Grind coarser or decrease dose"]
+    T1 -->|"Gusher (t < 20s or Q > 3.0 g/s)"| FixGush["⚠️ Critical Issue: Channeling Gusher<br/><b>Recommendation</b>: Grind finer or increase dose"]
+
+    T1 -->|"Normal Flow (20–35s)"| T2{"Tier 2: Brew Ratio Target?"}
+
+    T2 -->|"Ristretto (Ratio < 1:1.8, Sour)"| FixShort["⚖️ Ratio Issue: Under-extracted Ristretto<br/><b>Recommendation</b>: Increase shot time or yield target"]
+    T2 -->|"Lungo (Ratio > 1:2.4, Bitter)"| FixLong["⚖️ Ratio Issue: Over-extracted Lungo<br/><b>Recommendation</b>: Cut shot earlier to prevent astringency"]
+
+    T2 -->|"Balanced 1:2 Ratio"| T3{"Tier 3: Temperature Tuning?"}
+
+    T3 -->|"Too Cold (< 91°C, Sharp Acidity)"| FixCold["🌡️ Temp Issue: Under-developed Sweetness<br/><b>Recommendation</b>: Raise boiler temperature (+1–2°C)"]
+    T3 -->|"Too Hot (> 95°C, Harsh Bitterness)"| FixHot["🌡️ Temp Issue: Scorched Solubles<br/><b>Recommendation</b>: Lower boiler temperature (-1–2°C)"]
+
+    T3 -->|"Optimal 92–94°C"| GodShot["🌟 God Shot!<br/>Balanced Extraction (18–22% EY, 8–10% TDS, Sweet & Harmonious)"]
+```
 
 ---
 
