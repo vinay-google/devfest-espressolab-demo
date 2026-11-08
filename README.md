@@ -1,6 +1,6 @@
 # EspressoLab — Espresso Dial-In Simulator
 
-> **DevFest 2026 Live Demo Reference Implementation**: Built and verified end-to-end using **Google Antigravity (AGY)**, the **Elephant-Goldfish Model (EGM)** plugin, and **Google Cloud & Google Workspace Model Context Protocol (MCP)** integrations.
+> **[DevFest Seattle 2026](https://gdg.community.dev/events/details/google-gdg-seattle-presents-devfest-seattle-2026/) Live Demo Reference Implementation**: Built and verified end-to-end using **Google Antigravity (AGY)**, the **Elephant-Goldfish Model (EGM)** plugin, and **Google Cloud & Google Workspace Model Context Protocol (MCP)** integrations.
 
 EspressoLab is a zero-backend, client-side educational microapplication designed to teach home baristas the fluid dynamics, mass conservation, and sensory principles of dialing in espresso. Running entirely in the browser using vanilla ES6+ JavaScript, HTML5 Canvas, SVG, and CSS3, the simulator delivers real-time physical feedback across a fixed 1280x850 desktop viewport without scrolling.
 
@@ -153,7 +153,7 @@ sequenceDiagram
 
 ## How to Reproduce This Demo (Step-by-Step Runbook)
 
-Follow these exact steps from the DevFest 2026 live runbook to recreate or present this live demo.
+Follow these exact steps from the [DevFest Seattle 2026](https://gdg.community.dev/events/details/google-gdg-seattle-presents-devfest-seattle-2026/) live runbook to recreate or present this live demo.
 
 ### Part 0: Pre-Demo Prerequisites & Setup
 
@@ -384,4 +384,4 @@ This repository includes the complete audit trail and deliverables produced duri
 
 ---
 
-*Authored by Vinay Vyas for MTL/TOR DevFest 2026.*
+*Authored by Vinay Vyas for [DevFest Seattle 2026](https://gdg.community.dev/events/details/google-gdg-seattle-presents-devfest-seattle-2026/).*
